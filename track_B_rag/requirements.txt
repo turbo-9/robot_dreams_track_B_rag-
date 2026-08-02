@@ -1,0 +1,12 @@
+# Трек B (RAG). Локальні e5 + Chroma + Qwen, без API-ключів (на Colab torch уже встановлено — pip його пропустить).
+pytest>=8.0
+torch>=2.1
+transformers>=4.44
+accelerate>=0.33
+sentence-transformers>=3.0
+langchain-chroma>=0.1.4
+langchain-huggingface>=0.0.3
+langchain-text-splitters>=0.2
+# bitsandbytes>=0.43   # опційно: вмикає 4-bit генерацію на GPU (Colab); без нього — звичайне завантаження
+# deepeval>=1.0        # BaseMetric без ключа
+# ragas>=0.1.21        # крихкий на Colab: імпортуй у try/except усередині тесту

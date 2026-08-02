@@ -1,0 +1,24 @@
+# Ескіз PR-гейту Acme Cloud RAG.
+name: ai-pr-gate
+on:
+  pull_request:
+    paths: ["rag_sut.py", "src/**", "data/eval_dataset.jsonl", "tests/**", "requirements.txt"]
+jobs:
+  pr-gate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.11", cache: pip }
+      - run: pip install -r requirements.txt
+      # Offline gate: без GPU/ключів. Повний generate.py — лише nightly.
+      - name: Offline eval (run_eval)
+        run: bash run_eval.sh
+        env: { TRACK: B }
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rag-pr-eval
+          path: |
+            outputs/generations.json
+            reports/results.md

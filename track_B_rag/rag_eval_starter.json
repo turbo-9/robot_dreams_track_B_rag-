@@ -1,0 +1,17 @@
+{
+  "_note": "СТАРТОВИЙ gold-набір (приклад). Розшир щонайменше до 30 кейсів (RUBRIC критерій 2). gold_doc_ids потрібні для retrieval-метрик без API. Харнес читає data/eval_dataset.jsonl, тож перенеси кейси туди у його схемі: question -> input, expected_answer -> expected; поля gold_doc_ids / answerable / lang додай у рядок кейса як є.",
+  "cases": [
+    {"id": "Q1", "lang": "en", "question": "How much storage does the Free plan include?",
+     "answerable": true, "expected_answer": "5 GB", "gold_doc_ids": ["d1", "d7"]},
+    {"id": "Q2", "lang": "uk", "question": "Скільки коштує тариф Pro?",
+     "answerable": true, "expected_answer": "20 доларів", "gold_doc_ids": ["d8", "d3"]},
+    {"id": "Q3", "lang": "en", "question": "How much does the Acme Cloud Pro plan cost?",
+     "answerable": true, "expected_answer": "20 US dollars", "gold_doc_ids": ["d3"]},
+    {"id": "Q4", "lang": "en", "question": "What is the price of the Acme Cloud Enterprise plan?",
+     "answerable": false, "expected_answer": null, "gold_doc_ids": []},
+    {"id": "Q5", "lang": "uk", "question": "Скільки сховища дає безкоштовний тариф?",
+     "answerable": true, "expected_answer": "5 ГБ", "gold_doc_ids": ["d7", "d1"]},
+    {"id": "Q6", "lang": "en", "question": "In which regions does Acme Cloud store data?",
+     "answerable": true, "expected_answer": "EU regions only", "gold_doc_ids": ["d6"]}
+  ]
+}

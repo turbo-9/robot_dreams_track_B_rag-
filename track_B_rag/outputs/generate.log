@@ -1,0 +1,4 @@
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights: 100%|██████████| 199/199 [00:00<00:00, 19002.95it/s]
+Loading weights:   0%|          | 0/338 [00:00<?, ?it/s]Loading weights:   2%|▏         | 7/338 [00:00<00:11, 28.01it/s]Loading weights:  18%|█▊        | 62/338 [00:00<00:03, 80.97it/s]Loading weights:  25%|██▌       | 86/338 [00:00<00:02, 101.06it/s]Loading weights:  48%|████▊     | 163/338 [00:01<00:00, 215.94it/s]Loading weights: 100%|██████████| 338/338 [00:01<00:00, 314.48it/s]
+Saved 36 records to /Users/yaroslav/dev/TESTING-AI-MODELS-main/track_B_rag/outputs/generations.json
