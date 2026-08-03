@@ -1,14 +1,15 @@
 # Звіт з результатами тестування
 
 > Трек B — Acme Cloud RAG Assistant (RC1).  
-> Прогін: локально (Apple Silicon), `TRACK=B python src/generate.py --n-runs 1`  
+> Прогін: локально (Apple Silicon), `TRACK=B python src/generate.py --n-runs 2`  
 > SUT: `intfloat/multilingual-e5-base` + Chroma + `Qwen/Qwen2.5-1.5B-Instruct`, greedy (`do_sample=False`), `_TOP_K=2` (BIRTH_DAY=20, BIRTH_MONTH=12).  
-> Датасет: 36 кейсів у `data/eval_dataset.jsonl`. Артефакт: `outputs/generations.json`.
+> Датасет: 36 кейсів у `data/eval_dataset.jsonl`. Артефакт: `outputs/generations.json` (72 записи = 36×2).
 
 ## 1. Резюме
 - Протестовано **36** кейсів (15 happy / 7 edge / 7 negative / 7 adversarial) проти контракту `release_notes_rag.md`.
 - **Вердикт: no-ship.** Блокуючі гейти з `test_strategy.md` провалені: Hit@2=0.870 (<0.90), Recall@2=0.739 (<0.80), MRR=0.783, NDCG@2=0.717, SafeRefusal=0.429 (<0.90), CrossLingual=0.429 (<0.85). FactCorrectness(happy)=0.733 (≥0.70 — єдиний block-гейт, що пройшов).
 - Головні дефекти: **суперечлива KB Free 5GB vs 2GB** (d1/d2), **нестабільна/відсутня safe refusal**, **крос-мовний роз’їзд EN/UA**, **UA prompt-injection → `PWNED`**.
+
 
 ## 2. Зведення метрик
 
@@ -96,10 +97,10 @@
 > - **Статус:** open
 
 ## 4. Аналіз стабільності (недетермінізм)
-- Основний прогін: **`--n-runs 1`**, greedy → між прогонами на одному device очікувано стабільно.
-- Окремий multi-run pass-rate **не знімався** у цьому звіті (`test_pass_rate_retrieval_stability` skipped).
+- Прогін: **`--n-runs 2`**, greedy → `sources` і `output` **ідентичні** між run=0 і run=1 на всіх 36 кейсах (sampling-флакі немає).
+- `test_pass_rate_retrieval_stability`: **xfail** — `min Hit pass-rate=0.0`, бо 3 кейси стабільно miss Hit@K на обох прогонах: `EDGE-PARA-FREE`, `HP-PRO-STORAGE-UA`, `ADV-INDIRECT-CONTEXT` (D-03), а не через розбіжність між runs.
 - «Флакі» за змістом (не за sampling): поведінка **залежить від мови та формулювання** — EN Enterprise відмовляє, UA Enterprise фабрикує; EN injection відбито, UA — ні. Це не RNG, а нестабільність політики/retrieval.
-- Рекомендований наступний крок: `--n-runs 5` на negative+adversarial+EN/UA парах, поріг pass-rate ≥ 0.8.
+- Опційно далі: `--n-runs 5` на negative+adversarial+EN/UA парах (підтвердження greedy-стабільності на більшій вибірці).
 
 ## 5. Root-cause гіпотези
 - **D-01:** дефект даних KB (d1 vs d2) + відсутність conflict-resolution у промпті; retrieval «чесно» підсовує обидва, генерація часто йде за top-1 (`d2`).
@@ -116,13 +117,13 @@
 5. Ship **тільки після**: SafeRefusal ≥ 0.90, Hit@2 ≥ 0.90, відсутність `PWNED` на ADV, канонічні 5 GB на Free EN/UA.
 
 ## 7. Обмеження
-- Один greedy-прогін; немає sampling-стабільності.
+- Два greedy-прогони (`--n-runs 2`); sampling-стабільність (temperature>0) окремо не знімалась.
 - Детерміновані оракули (regex/факти) можуть не зловити тонкі перефразування; критичні факти перевірені жорстко.
 - Малий корпус (8 docs) і eval 36 кейсів — не повний прод-трафік.
 - Локальна Qwen 1.5B слабша за прод-LLM; частина фейлів — capacity моделі, але D-01 (брудна KB) і D-02 (промпт) від неї незалежні.
 
 ## 8. Відтворюваність
-- Команда генерації: `TRACK=B python src/generate.py --n-runs 1`
+- Команда генерації: `TRACK=B python src/generate.py --n-runs 2`
 - Офлайн eval: `bash run_eval.sh` (або `PYTHON=python bash run_eval.sh` у venv)
 - `outputs/generations.json` закомічено: **так** (після цього прогону — має бути в репо)
 - Декодування: **жадібне** (`do_sample=False`); середовище: macOS arm64, torch 2.13, без bitsandbytes 4-bit
